@@ -108,7 +108,6 @@ class MainWindow(QMainWindow):
         self.image_type_combobox.addItem("txt2img")
         self.image_type_combobox.addItem("img2img")
         intreg = QRegExp("\\d+")
-        floatreg = QRegExp("[-+]?[0-9]*\\.?[0-9]+")
         self.prompt_line = QPlainTextEdit(self)
         self.seed_line = QLineEdit(self)
         self.seed_line.setValidator(QRegExpValidator(intreg))
@@ -391,7 +390,7 @@ class MainWindow(QMainWindow):
         self.update_form()
 
     def prompt_func(self):
-        self.prompt = self.prompt_line.toPlainText()
+        self.prompt = self.prompt_line.toPlainText().replace("\"","\\\"")
 
     def ddim_func(self):
         self.ddim_steps = int(self.ddim_line.text())
