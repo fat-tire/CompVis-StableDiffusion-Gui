@@ -28,15 +28,35 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
 
         # Default variables
-        ## image settings
-        self.image_type = "txt2img"
-        self.start_command = "python3 scripts/" + self.image_type + ".py --prompt"
 
+        ## app settings  (what this gui is using)
+
+        self.app_id = "CompVis/stable-diffusion"
+        self.app_version = "69ae4b35e0a0f6ee1af8bb9a5d0016ccb27e36dc"
+        self.app_url = "https://github.com/CompVis/stable-diffusion"
+
+        # comment the above and uncomment this if using w/lstein's branch -- TODO:  autodetect this?
+        # self.app_id = "lstein/stable-diffusion"
+        # self.app_version = "dbc8fc79008795875eb22ebf0c57927061af86bc"
+        # self.app_url = "https://github.com/lstein/stable-diffusion"
+
+        self.scripts_path = "scripts/orig_scripts" if self.app_id == "lstein/stable-diffusion" else "scripts"
+
+        ## model settings (the default model for this app)
+
+        self.model = "stable diffusion"
+        self.model_id = "stable-diffusion-v1"
+        self.model_url = "https://github.com/CompVis/stable-diffusion/blob/main/Stable_Diffusion_v1_Model_Card.md"
+        self.model_hash = "fe4efff1e174c627256e44ec2991ba279b3816e364b49f9be2abc0b3ff3f8556"
+
+        ## default settings
+        self.image_type = "txt2img"
+        self.start_command = str(sys.executable) + " " + self.scripts_path + "/" + self.image_type + ".py --prompt"
         self.prompt = "a photograph of an astronaut riding a horse"
         self.strength = 0.7
         self.init_image_path = ""
         self.setBaseSize(1000, 1000)
-        self.setWindowTitle("Stable Diffusion GUI")
+        self.setWindowTitle(self.app_id + " GUI")
         self.out_dir = os.path.join(os.getcwd(), "outputs")
         self.seed = random.randint(1, 2147483647)
         self.ddim_steps = 50
@@ -306,7 +326,7 @@ class MainWindow(QMainWindow):
         if self.random_seed:
             self.new_seed()
         # generating command via variables
-        self.start_command = "python3 scripts/" + self.image_type + ".py --prompt"
+        self.start_command = str(sys.executable) + " " + self.scripts_path + "/" + self.image_type + ".py --prompt"
         generated_string = self.start_command + f' "{str(self.prompt_line.toPlainText())}" '
 
         if self.laion:
