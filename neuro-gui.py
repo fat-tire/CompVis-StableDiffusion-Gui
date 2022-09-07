@@ -24,6 +24,19 @@ class QTextEditLogger(logging.Handler):
 
 
 class MainWindow(QMainWindow):
+
+    def determine_app(self):
+        # this is hot garbage and should be either set manually per app or intelligently determined.
+        if os.path.isfile(".git/config"):
+            with open(r'.git/config', 'r') as f:
+                config = f.read()
+            # sorry only https:// will work.  This is truly terrible.
+            if '[remote "origin"]\n        url = https://github.com/lstein/stable-diffusion.git\n' in config:
+                return "lstein/stable-diffusion"
+            elif  '[remote "origin"]\n        url = https://github.com/basujindal/stable-diffusion.git\n' in config:
+                return "basujindal/stable-diffusion"
+        return "CompVis/stable-diffusion"
+
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
@@ -31,14 +44,18 @@ class MainWindow(QMainWindow):
 
         ## app settings  (what this gui is using)
 
-        self.app_id = "CompVis/stable-diffusion"
-        self.app_version = "69ae4b35e0a0f6ee1af8bb9a5d0016ccb27e36dc"
-        self.app_url = "https://github.com/CompVis/stable-diffusion"
-
-        # comment the above and uncomment this if using w/lstein's branch -- TODO:  autodetect this?
-        # self.app_id = "lstein/stable-diffusion"
-        # self.app_version = "dbc8fc79008795875eb22ebf0c57927061af86bc"
-        # self.app_url = "https://github.com/lstein/stable-diffusion"
+        if self.determine_app() == "lstein/stable-diffusion":
+            self.app_id = "lstein/stable-diffusion"
+            self.app_version = "dbc8fc79008795875eb22ebf0c57927061af86bc"
+            self.app_url = "https://github.com/lstein/stable-diffusion"
+        elif self.determine_app() == "basujindal/stable-diffusion":
+            self.app_id = "basujindal/stable-diffusion"
+            self.app_version = "c56b4932ca118bd33867d547d30b437d1657dacc"
+            self.app_url = "https://github.com/basujindal/stable-diffusion"
+        else:
+            self.app_id = "CompVis/stable-diffusion"
+            self.app_version = "69ae4b35e0a0f6ee1af8bb9a5d0016ccb27e36dc"
+            self.app_url = "https://github.com/CompVis/stable-diffusion"
 
         self.scripts_path = "scripts/orig_scripts" if self.app_id == "lstein/stable-diffusion" else "scripts"
 
@@ -179,6 +196,16 @@ class MainWindow(QMainWindow):
         self.layout.addRow(self.start_button)
         self._init_button_slots()
         self.update_form()
+        logging.info("Current App Config:")
+        logging.info("app_id: " + self.app_id)
+        logging.info("app_version (commit hash): " + self.app_version)
+        logging.info("app_url: " + self.app_url)
+        logging.info("")
+        logging.info("Current Model Config:")
+        logging.info("model: " + self.model)
+        logging.info("model_id: " + self.model_id)
+        logging.info("modeL_url: " + self.model_url)
+        logging.info("model_hash: " + self.model_hash)
 
     def update_form(self):
         self.prompt_line.setPlainText(self.prompt)
